@@ -1,0 +1,49 @@
+spring:
+  application:
+    name: payment-service
+
+  # Database Configuration (H2 for development)
+  datasource:
+    url: jdbc:h2:mem:paymentdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  # RabbitMQ Configuration（連接到同一個 RabbitMQ Server）
+  # Spring AMQP 的 acknowledge-mode 預設是 AUTO
+  rabbitmq:
+    host: localhost        # RabbitMQ 伺服器位置
+    port: 5672             # RabbitMQ 預設端口（與 Order Service 相同）
+    username: guest        # 預設帳號
+    password: guest        # 預設密碼
+    listener:
+      simple:
+        acknowledge-mode: manual  # 完全手動控制，需呼叫 basicAck/basicNack
+        prefetch: 10
+
+# Server Configuration（與 Order Service 不同的 port）
+server:
+  port: 8082
+
+# Logging Configuration
+logging:
+  level:
+    com.example.payment: DEBUG
+
+# SpringDoc / Swagger Configuration
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html

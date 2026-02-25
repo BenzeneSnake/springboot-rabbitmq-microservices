@@ -1,0 +1,46 @@
+spring:
+  application:
+    name: inventory-service
+
+  # Database Configuration (H2 for development)
+  datasource:
+    url: jdbc:h2:mem:inventorydb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    defer-datasource-initialization: true
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  # RabbitMQ Configuration
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    listener:
+      simple:
+        acknowledge-mode: manual
+        prefetch: 10
+        concurrency: 2
+        max-concurrency: 5
+
+# Server Configuration
+server:
+  port: 8083
+
+# Logging Configuration
+logging:
+  level:
+    com.example.inventory: DEBUG
