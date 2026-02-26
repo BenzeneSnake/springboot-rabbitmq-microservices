@@ -60,21 +60,14 @@ public class PaymentService {
         }
 
         // 2. 建立冪等性記錄（status=PROCESSING），防止並發重複處理
-        IdempotencyRecord record = IdempotencyRecord.builder()
-                .eventId(processPaymentCommand.getEventId())
-                .eventType("ORDER_CREATED")
-                .status(IdempotencyRecordStatus.PROCESSING)
-                .build();
+        IdempotencyRecord record = IdempotencyRecord.createIdempotencyRecord(processPaymentCommand.getEventId());
         idempotencyRepository.save(record);
         log.info("Idempotency record created: eventId={}, status=PROCESSING", processPaymentCommand.getEventId());
 
         // 3. 建立付款紀錄
-        Payment payment = Payment.builder()
-                .orderId(processPaymentCommand.getOrderId())
-                .customerId(processPaymentCommand.getCustomerId())
-                .amount(processPaymentCommand.getTotalAmount())
-                .status(PaymentStatus.PROCESSING)
-                .build();
+        Payment payment = Payment.createPayment(processPaymentCommand.getOrderId(),
+                processPaymentCommand.getCustomerId(),
+                processPaymentCommand.getTotalAmount());
 
         payment = paymentRepository.save(payment);
         log.info("Payment created: paymentId={}, orderId={}", payment.getId(), processPaymentCommand.getOrderId());
@@ -86,8 +79,7 @@ public class PaymentService {
         paymentEventPublisher.publishPaymentCompleted(payment, processPaymentCommand.getItems());
 
         // 6. 更新冪等性記錄為 PROCESSED
-        record.setStatus(IdempotencyRecordStatus.PROCESSED);
-        record.setProcessedAt(LocalDateTime.now());
+        record.updateRecordStatus(record);
         idempotencyRepository.save(record);
         log.info("Idempotency record updated: eventId={}, status=PROCESSED", processPaymentCommand.getEventId());
 

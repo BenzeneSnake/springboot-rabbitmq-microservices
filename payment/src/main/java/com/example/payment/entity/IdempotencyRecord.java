@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 冪等性記錄
@@ -22,9 +23,7 @@ import java.time.LocalDateTime;
 @Table(name = "idempotency_record",
         uniqueConstraints = @UniqueConstraint(columnNames = "event_id"))
 @Data
-@Builder
 @NoArgsConstructor
-@AllArgsConstructor
 public class IdempotencyRecord {
 
     @Id
@@ -34,8 +33,9 @@ public class IdempotencyRecord {
     @Column(name = "event_id", nullable = false, unique = true)
     private String eventId;
 
-    @Column(name = "event_type", nullable = false)
-    private String eventType;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private IdempotencyEventType eventType;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -43,4 +43,28 @@ public class IdempotencyRecord {
 
     @Column(name = "processed_at")
     private LocalDateTime processedAt;
+
+    @Builder
+    public IdempotencyRecord(Long id,String eventId,IdempotencyEventType eventType,
+                             IdempotencyRecordStatus status, LocalDateTime processedAt) {
+        this.id = id;
+        this.eventId = eventId;
+        this.eventType = eventType;
+        this.status = status;
+        this.processedAt = processedAt;
+    }
+
+    public static IdempotencyRecord createIdempotencyRecord(String eventId){
+        return  IdempotencyRecord.builder()
+                .eventId(eventId)
+                .eventType(IdempotencyEventType.ORDER_CREATED)
+                .status(IdempotencyRecordStatus.PROCESSING)
+                .build();
+    }
+
+    public void  updateRecordStatus(IdempotencyRecord record){
+
+        this.status = IdempotencyRecordStatus.PROCESSED;
+        this.processedAt = LocalDateTime.now();
+    }
 }
