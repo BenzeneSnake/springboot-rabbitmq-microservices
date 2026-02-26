@@ -37,4 +37,15 @@ public class Payment {
 
     private LocalDateTime createdAt;
     private LocalDateTime completedAt;
+
+
+    public static  Payment  createPayment(String orderId,String customerId,BigDecimal totalAmount) {
+        return Payment.builder()
+                .orderId(orderId)
+                .customerId(customerId)
+                .amount(totalAmount)
+                .status(PaymentStatus.PROCESSING)
+                .createdAt(LocalDateTime.now())
+                .build();
+    }
 }
