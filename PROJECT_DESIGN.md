@@ -927,7 +927,7 @@ open http://localhost:15672
 
 - [x] 實現 Order Service 基本結構（不含 MQ）
 - [x] 添加 MQ 到 Order Service
-- [ ] 設定 RabbitMQ (docker-compose.yml)
+- [x] 設定 RabbitMQ (docker-compose.yml)
 - [x] 實現 Payment Service（Phase 1~4 全部完成）
 - [x] 實現 Inventory Service Phase 1（基礎結構，不含 MQ）
 - [x] 實現 Inventory Service Phase 2（MQ Consumer + DLX 設定 + 重試分流）
